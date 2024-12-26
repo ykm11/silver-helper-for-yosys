@@ -3,7 +3,7 @@ import re
 
 match_comment = re.compile(r"[\(/]\*.+\*[\)/]") # for yosys comment-out
 match_range = re.compile(r"\[(\d+?):(\d+?)\]")
-match_gate = re.compile(r"\(\.A\((.+)\),\.B\((.+)\),\.Y\((.+)\)\)")
+match_gate_2i1o = re.compile(r"\(\.A\((.+)\),\.B\((.+)\),\.Y\((.+)\)\)")
 match_reg = re.compile(r"\.D\((.+)\),\.Q\((.+)\)\)")
 
 def interpre(f_name):
@@ -41,19 +41,19 @@ def interpre(f_name):
                         text = ""
                         continue
 
-                    #if end == 0:
-                    #    inputs.append(op[-1])
-                    #    text = ""
-                    #    continue
                     for i in range(inout_start, inout_end+1):
-                        inputs.append(f"{op[-1]}[{i}]")
+                        if inout_end == 0:
+                            inputs.append(f"{op[-1]}")
+                        else:
+                            inputs.append(f"{op[-1]}[{i}]")
 
                         if op[-1].lower() == "refreshing":
                             res.append(f"ref {len(res)}")
                         else:
                             res.append(f"in {len(res)} {input_val_num}_{i}")
 
-                    input_val_num += 1
+                    if op[-1].lower() != "refreshing":
+                        input_val_num += 1
 
                 elif operand == "output":
                     if inout_end == 0:
@@ -68,7 +68,7 @@ def interpre(f_name):
                     d = {}
                     d["gate"] = op[0].lower()
 
-                    m = match_gate.search(op[2])
+                    m = match_gate_2i1o.search(op[2])
                     if not m:
                         print("[*] Gate not found")
                         assert(False)
