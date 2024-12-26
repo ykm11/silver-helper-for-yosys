@@ -139,7 +139,7 @@ def make_silver_syntax(res, inputs, outputs, gates, registers):
             t = f"out {reg_in_num} {len(outputs)-1-i}_{out_share_num}"
             
             res.append(t)
-            wires.append(reg_out)
+            wires.append(out)
             outputs.pop(i)
 
             out_share_num += 1
