@@ -1,7 +1,7 @@
+import argparse
 import re
 
 match_comment = re.compile(r"[\(/]\*.+\*[\)/]") # for yosys comment-out
-#match_ope = re.compile(r"^([a-z]+) (\[\d+:\d+\])? (.+);$")
 match_range = re.compile(r"\[(\d+?):(\d+?)\]")
 match_gate = re.compile(r"\(\.A\((.+)\),\.B\((.+)\),\.Y\((.+)\)\)")
 match_reg = re.compile(r"\.D\((.+)\),\.Q\((.+)\)\)")
@@ -87,13 +87,8 @@ def interpre(f_name):
                     d["out"] = m[2]
                     registers.append(d)
 
-                #print(text)
                 text = ""
                 
-    #print(inputs, outputs)
-    #print(gates)
-    #print(registers)
-
     return res, inputs, outputs, gates, registers
 
 
@@ -138,34 +133,35 @@ def make_silver_syntax(res, inputs, outputs, gates, registers):
     out_share_num = 0
     for i in range(len(outputs)-1, -1, -1):
         out = outputs[i]
-        #print(out); exit()
             
         if out in wires:
             reg_in_num = wires.index(out)
             t = f"out {reg_in_num} {len(outputs)-1-i}_{out_share_num}"
             
-            #print(t)
             res.append(t)
             wires.append(reg_out)
             outputs.pop(i)
 
             out_share_num += 1
 
-    #for gate in gates:
-        #print(gate)
-    #print(res)
     return res
 
 
 if __name__ == "__main__":
-    res, inputs, outputs, gates, registers = interpre("./result_netlist.v")
-    #print(inputs, outputs)
-    #print(gates)
-    #print(registers)
-    #print(res)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("infile")
+    parser.add_argument("-o", "--outfile")
+    args = parser.parse_args()
+    infile = args.infile
+
+    res, inputs, outputs, gates, registers = interpre(infile)
     res = make_silver_syntax(res, inputs, outputs, gates, registers)
 
-    print()
-    for line in res:
-        print(line)
+    if args.outfile:
+        with open(args.outfile, "w", newline="\n") as f:
+            for line in res:
+                f.write(line + "\n")
+    else:
+        for line in res:
+            print(line)
 
