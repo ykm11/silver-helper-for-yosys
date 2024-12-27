@@ -21,7 +21,6 @@ def interpre(f_name):
             substituted_line = match_comment.sub("", line)
             if len(substituted_line) == 0:
                 continue
-            #print(g)
 
             text += substituted_line
             if text[-1] == ";":
@@ -37,7 +36,7 @@ def interpre(f_name):
                     inout_end = int(length[1])
 
                 if operand == "input":
-                    if op[-1].lower() == "clk": # identifier of the clock signal should be "clk"
+                    if op[-1].lower() in ["clk", "rst"]: # identifier of the clock signal and reset should be "clk" and "rst", respectively
                         text = ""
                         continue
 
@@ -51,6 +50,7 @@ def interpre(f_name):
                             res.append(f"ref {len(res)}")
                         else:
                             res.append(f"in {len(res)} {input_val_num}_{i}")
+                            #res.append(f"in {len(res)} {i}_{input_val_num}")
 
                     if op[-1].lower() != "refreshing":
                         input_val_num += 1
@@ -106,7 +106,6 @@ def make_silver_syntax(res, inputs, outputs, gates, registers):
                 gate_in = gate["in"]
                 gate_out = gate["out"][0]
                 if set(gate_in).issubset(wires):
-                    #print(gate_in)
                     
                     gate_in_num = [str(wires.index(wire)) for wire in gate_in]
                     t = f"{gate['gate']} {' '.join(gate_in_num)}"
