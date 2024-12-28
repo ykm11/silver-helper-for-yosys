@@ -1,6 +1,8 @@
 import argparse
 import re
 
+TIMEOUT = 10
+
 match_comment = re.compile(r"[\(/]\*.+\*[\)/]") # for yosys comment-out
 match_range = re.compile(r"\[(\d+?):(\d+?)\]")
 match_gate_2i1o = re.compile(r"\(\.A\((.+)\),\.B\((.+)\),\.Y\((.+)\)\)")
@@ -99,7 +101,11 @@ def make_silver_syntax(res, inputs, outputs, gates, registers):
     #gates = sorted(gates, key=lambda x: (x["gate"]))
     #print(gates)
 
+    loop_count = 0
+    current_num_gates = len(gates)
+    current_num_registers = len(registers)
     while len(gates) > 0  or len(registers) > 0:
+
         for _ in range(3):
             for i in range(len(gates)-1, -1, -1):
                 gate = gates[i]
@@ -129,6 +135,22 @@ def make_silver_syntax(res, inputs, outputs, gates, registers):
                 wires.append(reg_out)
                 registers.pop(i)
 
+
+        current_num_gates_tmp = len(gates)
+        current_num_registers_tmp = len(registers)
+        if current_num_registers == current_num_registers_tmp and \
+                current_num_gates == current_num_gates_tmp:
+                    loop_count += 1
+        else:
+            current_num_gates = current_num_gates_tmp
+            current_num_registers = current_num_registers_tmp
+            loop_count = 0
+
+        if loop_count == TIMEOUT:
+            print("[*] TIME OUT")
+            assert(False)
+
+
     out_share_num = 0
     for i in range(len(outputs)-1, -1, -1):
         out = outputs[i]
@@ -153,9 +175,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
     infile = args.infile
 
+
     res, inputs, outputs, gates, registers = interpre(infile)
     res = make_silver_syntax(res, inputs, outputs, gates, registers)
-
     if args.outfile:
         with open(args.outfile, "w", newline="\n") as f:
             for line in res:
