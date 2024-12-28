@@ -52,7 +52,7 @@ def interpre(f_name):
                             res.append(f"ref {len(res)}")
                         else:
                             res.append(f"in {len(res)} {input_val_num}_{i}")
-                            #res.append(f"in {len(res)} {i}_{input_val_num}")
+                            #res.append(f"in {len(res)} {i}_{input_val_num}") # when the input is represented as ([N:0] share 1, [N:0] share 2, ..)
 
                     if op[-1].lower() != "refreshing":
                         input_val_num += 1
@@ -96,10 +96,7 @@ def interpre(f_name):
 
 def make_silver_syntax(res, inputs, outputs, gates, registers):
     wires = inputs.copy()
-    #print(wires)
-    gates = sorted(gates, key=lambda x: (x["gate"], x["in"][0]))
-    #gates = sorted(gates, key=lambda x: (x["gate"]))
-    #print(gates)
+    gates = sorted(gates, key=lambda x: (x["gate"], x["in"][0], x["in"][1]))
 
     loop_count = 0
     current_num_gates = len(gates)
@@ -116,7 +113,6 @@ def make_silver_syntax(res, inputs, outputs, gates, registers):
                     gate_in_num = [str(wires.index(wire)) for wire in gate_in]
                     t = f"{gate['gate']} {' '.join(gate_in_num)}"
 
-                    #print(t)
                     res.append(t)
                     wires.append(gate_out)
                     gates.pop(i)
@@ -130,7 +126,6 @@ def make_silver_syntax(res, inputs, outputs, gates, registers):
                 reg_in_num = wires.index(reg_in)
                 t = f"reg {reg_in_num}"
 
-                #print(t)
                 res.append(t)
                 wires.append(reg_out)
                 registers.pop(i)
@@ -170,8 +165,8 @@ def make_silver_syntax(res, inputs, outputs, gates, registers):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("infile")
-    parser.add_argument("-o", "--outfile")
+    parser.add_argument("infile", help="Verilog file (synthesized by yosys)")
+    parser.add_argument("-o", "--outfile", help="Filename or path to write results.")
     args = parser.parse_args()
     infile = args.infile
 
