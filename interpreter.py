@@ -48,13 +48,13 @@ def interpre(f_name):
                         else:
                             inputs.append(f"{op[-1]}[{i}]")
 
-                        if op[-1].lower() == "refreshing":
+                        if op[-1].lower() in ["refreshing", "randomness"]:
                             res.append(f"ref {len(res)}")
                         else:
                             res.append(f"in {len(res)} {input_val_num}_{i}")
                             #res.append(f"in {len(res)} {i}_{input_val_num}") # when the input is represented as ([N:0] share 1, [N:0] share 2, ..)
 
-                    if op[-1].lower() != "refreshing":
+                    if op[-1].lower() not in ["refreshing", "randomness"]:
                         input_val_num += 1
 
                 elif operand == "output":
