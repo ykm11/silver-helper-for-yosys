@@ -1,8 +1,8 @@
-read_verilog ./bar.v
+read_verilog ./val_and_tag.v
 read_verilog -lib LIB/custom_cells.v
 
 setattr -set keep_hierarchy 1;
-synth -top MyAND -noabc
+synth -top Mul_valtag  -noabc
 dfflibmap -liberty LIB/custom_cells.lib
 abc -liberty LIB/custom_cells.lib -fast
 opt_clean
@@ -11,7 +11,7 @@ stat -liberty LIB/custom_cells.lib
 
 setattr -set keep_hierarchy 0;
 flatten
-select MyAND
+select Mul_valtag
 insbuf -buf BUF A Y
 
-write_verilog -selected result_netlist.v
+write_verilog -noattr -selected result_netlist.v
