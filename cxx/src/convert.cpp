@@ -23,6 +23,12 @@ int main(int argc, char* argv[]) {
     std::vector<std::string> outputs;
     std::vector<std::string> result;
 
+    gates.reserve(128);
+    registers.reserve(128);
+    inputs.reserve(128);
+    outputs.reserve(128);
+    result.reserve(256);
+
     read_verilog(gates, registers, inputs, outputs, filename);
     std::sort(gates.begin(), gates.end(), 
         [](const Gate &x, const Gate &y) {
