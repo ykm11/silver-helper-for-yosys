@@ -5,5 +5,7 @@
 namespace RegexPatterns {
     const std::regex match_gate("\\(\\.A\\((.+)\\),\\.B\\((.+)\\),\\.Y\\((.+)\\)\\)");
     const std::regex match_reg("\\.D\\((.+)\\),\\.Q\\((.+)\\)\\)");
+    const std::regex match_comment("[\\(/]\\*.+\\*[\\)/]");
+    const std::regex match_range("\\[(\\d+?):(\\d+?)\\]");
 }
 
