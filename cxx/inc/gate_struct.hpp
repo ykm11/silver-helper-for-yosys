@@ -39,12 +39,13 @@ class Gate {
 };
 
 class Gate_2i1o {
-    private:
+    public:
+    //private:
         std::string logic;
         std::vector<std::string> g_in;
         std::vector<std::string> g_out;
 
-    public:
+    //public:
         Gate_2i1o() {
             logic = "";
             g_in.reserve(2);
