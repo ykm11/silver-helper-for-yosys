@@ -4,12 +4,12 @@ import re
 TIMEOUT = 10
 
 match_comment = re.compile(r"[\(/]\*.+\*[\)/]") # for yosys comment-out
-match_range = re.compile(r"\[(\d+?):(\d+?)\]")
+#match_range = re.compile(r"\[(\d+?):(\d+?)\]")
+match_range = re.compile(r"([a-z0-9]+?)\[(\d+?):(\d+?)\]")
 match_gate_2i1o = re.compile(r"\(\.A\((.+)\),\.B\((.+)\),\.Y\((.+)\)\)")
 match_reg = re.compile(r"\.D\((.+)\),\.Q\((.+)\)\)")
 
-def interpre(f_name):
-    res = []
+def read_verilog(f_name):
     inputs = []
     outputs = []
     gates = []
@@ -26,44 +26,27 @@ def interpre(f_name):
 
             text += substituted_line
             if text[-1] == ";":
-                text = text.strip(";")
+                text = text.rstrip(";")
                 op = text.split()
                 operand = op[0]
-                length = match_range.search(op[1])
-
-                inout_start = 0
-                inout_end = 0
-                if length:
-                    inout_start = int(length[2])
-                    inout_end = int(length[1])
 
                 if operand == "input":
                     if op[-1].lower() in ["clk", "rst"]: # identifier of the clock signal and reset should be "clk" and "rst", respectively
                         text = ""
                         continue
 
-                    for i in range(inout_start, inout_end+1):
-                        if inout_end == 0:
-                            inputs.append(f"{op[-1]}")
-                        else:
-                            inputs.append(f"{op[-1]}[{i}]")
-
-                        if op[-1].lower() in ["refreshing", "randomness"]:
-                            res.append(f"ref {len(res)}")
-                        else:
-                            res.append(f"in {len(res)} {input_val_num}_{i}")
-                            #res.append(f"in {len(res)} {i}_{input_val_num}") # when the input is represented as ([N:0] share 1, [N:0] share 2, ..)
-
-                    if op[-1].lower() not in ["refreshing", "randomness"]:
-                        input_val_num += 1
+                    if len(op) < 3: # input a
+                        inputs.append(f"{op[1]}")
+                    else:           # input [N:M] a
+                        inputs.append(f"{op[2]}{op[1]}")
 
                 elif operand == "output":
-                    if inout_end == 0:
-                        outputs.append(op[-1])
-                        text = ""
-                        continue
-                    for i in range(inout_start, inout_end+1):
-                        outputs.append(f"{op[-1]}[{i}]")
+
+                    if len(op) < 3:
+                        outputs.append(f"{op[1]}")
+                    else:
+                        outputs.append(f"{op[2]}{op[1]}")
+
 
                 elif operand in ["AND", "XOR"]:
                     ## ex: AND _0_ (.A(b[0]),.B(a[1]),.Y(c2_0))
@@ -91,12 +74,43 @@ def interpre(f_name):
 
                 text = ""
                 
-    return res, inputs, outputs, gates, registers
+    return inputs, outputs, gates, registers
 
-
-def make_silver_syntax(res, inputs, outputs, gates, registers):
-    wires = inputs.copy()
+def make_silver_syntax(inputs, outputs, gates, registers):
+    wires = []
+    res = []
     gates = sorted(gates, key=lambda x: (x["gate"], x["in"][0], x["in"][1]))
+
+    # make input wires
+    num_input_val = 0
+    for input_val in inputs:
+        identifier = match_range.search(input_val)
+        if identifier: # array input
+
+            if identifier[1] in ["refreshing", "randomness"]:
+                range_start = int(identifier[3])
+                range_end = int(identifier[2])
+                for i in range(range_start, range_end+1):
+                    wires.append(f"{identifier[1]}[{i}]")
+                    res.append(f"ref {len(res)}")
+            else:
+                range_start = int(identifier[3])
+                range_end = int(identifier[2])
+                for i in range(range_start, range_end+1):
+                    wires.append(f"{identifier[1]}[{i}]")
+                    res.append(f"in {len(res)} {num_input_val}_{i}")
+                    #res.append(f"in {len(res)} {i}_{num_input_val}_")
+
+        else: # mono input
+            wires.append(input_val)
+
+            if input_val in ["refreshing", "randomness"]:
+                res.append(f"ref {len(res)}")
+
+            else:
+                res.append(f"in {len(res)} {num_input_val}_0")
+
+        num_input_val += 1
 
     loop_count = 0
     current_num_gates = len(gates)
@@ -146,19 +160,24 @@ def make_silver_syntax(res, inputs, outputs, gates, registers):
             assert(False)
 
 
-    out_share_num = 0
-    for i in range(len(outputs)-1, -1, -1):
-        out = outputs[i]
-            
-        if out in wires:
-            reg_in_num = wires.index(out)
-            t = f"out {reg_in_num} {len(outputs)-1-i}_{out_share_num}"
-            
-            res.append(t)
-            wires.append(out)
-            outputs.pop(i)
+    num_output_val = 0
+    for output_val in outputs:
+        identifier = match_range.search(output_val)
+        
+        if identifier:
+            range_start = int(identifier[3])
+            range_end = int(identifier[2])
+            for i in range(range_start, range_end+1):
+                reg_in_num = wires.index(f"{identifier[1]}[{i}]")
+                t = f"out {reg_in_num} {num_output_val}_{i}"
+                res.append(t)
 
-            out_share_num += 1
+        else:
+            reg_in_num = wires.index(f"{identifier[1]}")
+            t = f"out {reg_in_num} {num_output_val}_0"
+            res.append(t)
+
+        num_output_val += 1
 
     return res
 
@@ -171,8 +190,8 @@ if __name__ == "__main__":
     infile = args.infile
 
 
-    res, inputs, outputs, gates, registers = interpre(infile)
-    res = make_silver_syntax(res, inputs, outputs, gates, registers)
+    inputs, outputs, gates, registers = read_verilog(infile)
+    res = make_silver_syntax(inputs, outputs, gates, registers)
     if args.outfile:
         with open(args.outfile, "w", newline="\n") as f:
             for line in res:
