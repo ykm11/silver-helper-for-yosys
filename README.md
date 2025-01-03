@@ -1,4 +1,6 @@
 # A helper module for SILVER to support the yosys synthesis
+This module helps you to parse the synthesized verilog file by yosys and make a netlist correspoinding to SILVER tool.
+
 
 A directory LIB and a yosys script synthe.ys are forked/copied from [SILVER](https://github.com/Chair-for-Security-Engineering/SILVER/tree/master/yosys) and have been modified by ykm11. Additionally, a shell script synthesize.sh is from [PROLEAD](https://github.com/ChairImpSec/PROLEAD/tree/main/yosys/syn) (and has been modified too). The shell script is useful than the yosys script, we thus recommend you to use this.
 
