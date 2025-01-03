@@ -23,7 +23,7 @@ int parse(std::vector<std::string> &result,
     size_t num_output_val = 0;
     size_t range_start, range_end;
 
-    // for inputs
+    // making input wires
     for (size_t i = 0; i < inputs.size(); i++) {
         // input a[n:m];
         if (std::regex_search(inputs[i], m, RegexPatterns::match_range)){
@@ -36,28 +36,30 @@ int parse(std::vector<std::string> &result,
                 if (identifier == "refreshing" || identifier == "randomness") {
                     result.push_back("ref " + std::to_string(result.size()));
                 } else {
-                    result.push_back("in " + 
-                            std::to_string(result.size()) +
-                            " " + 
-                            std::to_string(num_input_val) +
-                            "_" +
-                            std::to_string(i)
-                            );
+                    result.push_back(
+                        "in " + 
+                        std::to_string(result.size()) +
+                        " " + 
+                        std::to_string(num_input_val) +
+                        "_" +
+                        std::to_string(i)
+                    );
                 }
             }
         } else {
-            // input a;
+        // input a;
             identifier = inputs[i];
             wires.push_back(identifier);
             if (identifier == "refreshing" || identifier == "randomness") {
                 result.push_back("ref " + std::to_string(result.size()));
             } else {
-                result.push_back("in " + 
-                        std::to_string(result.size()) +
-                        " " + 
-                        std::to_string(num_input_val) +
-                        "_0"
-                        );
+                result.push_back(
+                    "in " + 
+                    std::to_string(result.size()) +
+                    " " + 
+                    std::to_string(num_input_val) +
+                    "_0"
+                );
             }
         }
         num_input_val++;
@@ -66,6 +68,7 @@ int parse(std::vector<std::string> &result,
     size_t current_gate_num, current_register_num;
     size_t count_loop = 0;
     while (n_gates.size() > 0 || n_registers.size() > 0) {
+        // check whether the amount of gates/registers was reduced or not
         current_gate_num = n_gates.size();
         current_register_num = n_registers.size();
 
@@ -76,32 +79,34 @@ int parse(std::vector<std::string> &result,
 
                 if (in_a != wires.end() && in_b != wires.end()) {
                     result.push_back(
-                            n_gates[i].logic + 
-                            " " +
-                            std::to_string(std::distance(wires.begin(), in_a)) +
-                            " " +
-                            std::to_string(std::distance(wires.begin(), in_b))
-                            );
+                        n_gates[i].logic + 
+                        " " +
+                        std::to_string(std::distance(wires.begin(), in_a)) +
+                        " " +
+                        std::to_string(std::distance(wires.begin(), in_b))
+                    );
 
                     wires.push_back(n_gates[i].g_out[0]);
                     n_gates.erase(n_gates.begin() + i);
                 }
             }
         }
+
         for (int i = n_registers.size()-1; i >= 0; i--) {
             auto in = std::find(wires.begin(), wires.end(), n_registers[i].in);
 
             if (in != wires.end()) {
                 result.push_back(
-                        "reg " +
-                        std::to_string(std::distance(wires.begin(), in))
-                        );
+                    "reg " +
+                    std::to_string(std::distance(wires.begin(), in))
+                );
 
                 wires.push_back(n_registers[i].out);
                 n_registers.erase(n_registers.begin() + i);
             }
         }
 
+        // Aboiding an infinite loop
         if (current_gate_num == n_gates.size() && 
                 current_register_num == n_registers.size()) {
             count_loop++;
@@ -114,9 +119,9 @@ int parse(std::vector<std::string> &result,
         }
     }
 
-    // for outputs
+    // for output wires
     for (size_t i = 0; i < outputs.size(); i++) {
-        // a[n:m]
+        // output c[n:m]
         if (std::regex_search(outputs[i], m, RegexPatterns::match_range) ){
             range_start = std::stol(m[3]);
             range_end = std::stol(m[2]);
@@ -133,20 +138,20 @@ int parse(std::vector<std::string> &result,
                         std::to_string(num_output_val) +
                         "_" +
                         std::to_string(i)
-                        );
+                    );
                 }
             }
         } else {
-            // a
+        // output c
             auto in = std::find(wires.begin(), wires.end(), outputs[i]);
             if (in != wires.end()) {
-            result.push_back(
-                "out " +
-                std::to_string(std::distance(wires.begin(), in)) + 
-                " " + 
-                std::to_string(num_output_val) +
-                "_0"
-                );        
+                result.push_back(
+                    "out " +
+                    std::to_string(std::distance(wires.begin(), in)) + 
+                    " " + 
+                    std::to_string(num_output_val) +
+                    "_0"
+                    );        
             }
         }
         num_output_val++;
@@ -164,9 +169,6 @@ int read_verilog(std::vector<Gate> &gates, std::vector<Dff> &registers,
 
     size_t num_input_val = 0;
     size_t word_start, word_end;
-
-    gates.reserve(128);
-    registers.reserve(128);
 
     std::smatch m;
 
@@ -186,6 +188,7 @@ int read_verilog(std::vector<Gate> &gates, std::vector<Dff> &registers,
             word_start = 0;
             word_end = 0;
 
+            // split words by space
             while ((word_end = text.find(' ', word_start)) != std::string::npos) {
                 if (word_end != word_start) { // no continuous spaces
                     words.push_back(text.substr(word_start, word_end - word_start));
@@ -210,7 +213,7 @@ int read_verilog(std::vector<Gate> &gates, std::vector<Dff> &registers,
                 if (words.size() < 3) { // input a
                     inputs.push_back(words[1]);
 
-                } else {                // input [n:m] a
+                } else {                // input [n:m] a -> a[n:m]
                     inputs.push_back(words[2] + words[1]);
                 }
 #if DEBUG
@@ -260,7 +263,8 @@ int read_verilog(std::vector<Gate> &gates, std::vector<Dff> &registers,
                     gates.push_back(gate);
                 }
             }
-            text = "";
+            //text = "";
+            text.clear();
             words.clear();
         }
 
