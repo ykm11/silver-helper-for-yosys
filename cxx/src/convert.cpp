@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
             return x.logic > y.logic;
         });
 
-    analyze(result, gates, registers, inputs, outputs);
+    parse(result, gates, registers, inputs, outputs);
 
     for (size_t i = 0; i < result.size(); i++) {
         printf("%s\n", result[i].c_str());

@@ -16,7 +16,7 @@ int read_verilog(std::vector<Gate>&, std::vector<Dff>&,
         std::vector<std::string>&, std::vector<std::string>&, 
         std::string&);
 
-int analyze(std::vector<std::string>&,
+int parse(std::vector<std::string>&,
         const std::vector<Gate>&, const std::vector<Dff>&, 
         const std::vector<std::string>&, const std::vector<std::string>&);
 

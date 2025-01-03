@@ -10,7 +10,7 @@
 #include "regrex_patterns.hpp"
 
 
-int analyze(std::vector<std::string> &result,
+int parse(std::vector<std::string> &result,
         const std::vector<Gate> &gates, const std::vector<Dff> &registers, 
         const std::vector<std::string> &inputs, const std::vector<std::string> &outputs) {
     std::vector<std::string> wires;
