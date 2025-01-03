@@ -4,6 +4,7 @@
 #include <fstream>
 #include <vector>
 #include <algorithm>
+#include <cstdio>
 
 #include "read_verilog.hpp"
 #include "gate_struct.hpp"
@@ -11,8 +12,16 @@
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        printf("Give me a netlist file");
+        printf("Give me a verilog file");
         return 1;
+    }
+    FILE *outFile = nullptr;
+    if (argc > 2) {
+        outFile = fopen(argv[2], "w");
+        if (outFile == nullptr) {
+            perror("The specified file for the output couldn't be opened");
+            return 1;
+        }
     }
 
     std::string filename = argv[1];
@@ -43,7 +52,14 @@ int main(int argc, char* argv[]) {
 
     parse(result, gates, registers, inputs, outputs);
 
-    for (size_t i = 0; i < result.size(); i++) {
-        printf("%s\n", result[i].c_str());
+    if (outFile == nullptr) {
+        for (size_t i = 0; i < result.size(); i++) {
+            printf("%s\n", result[i].c_str());
+        }
+    } else {
+        for (size_t i = 0; i < result.size(); i++) {
+            fprintf(outFile, "%s\n", result[i].c_str());
+        }
+        printf("The resulting output has been written in %s\n", argv[2]);
     }
 }
