@@ -40,9 +40,9 @@ int parse(std::vector<std::string> &result,
                         "in " + 
                         std::to_string(result.size()) +
                         " " + 
-                        std::to_string(num_input_val) +
+                        std::to_string(i) + 
                         "_" +
-                        std::to_string(i)
+                        std::to_string(num_input_val)
                     );
                 }
             }
@@ -112,6 +112,7 @@ int parse(std::vector<std::string> &result,
             count_loop++;
 
             if (count_loop > TIME_OUT) {
+                printf("Infinite loop found. exiting..");
                 abort();
             }
         } else{
