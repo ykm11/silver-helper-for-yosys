@@ -3,7 +3,7 @@ This module helps you to parse the synthesized verilog file by yosys and make a 
 Despite SILVER can deal the synthesize verilog file, not netlist format, by adding annotations on the code, e.g., `(* SILVER="attribute" *)`, we believe that the netlist format is more suitable for not only SILVER but also for another verification tools. A concept of this module is to provide a solution to convert a verilog source code to a netlist.  
 
 
-A directory LIB and a yosys script synthe.ys are forked/copied from [SILVER](https://github.com/Chair-for-Security-Engineering/SILVER/tree/master/yosys) and have been modified by ykm11. Additionally, a shell script synthesize.sh is from [PROLEAD](https://github.com/ChairImpSec/PROLEAD/tree/main/yosys/syn) (and has been modified too). The shell script is useful than the yosys script, we thus recommend you to use this.
+A directory LIB and a yosys script synthe.ys are forked/copied from [SILVER](https://github.com/Chair-for-Security-Engineering/SILVER/tree/master/yosys) and have been modified by Haruka Hirata. Additionally, a shell script synthesize.sh is from [PROLEAD](https://github.com/ChairImpSec/PROLEAD/tree/main/yosys/syn) (and has been modified too). The shell script is useful than the yosys script, we thus recommend you to use this.
 
 We have tested for verilog implementations of DOM1, DOM2, DOM3, CMS2, and CMS3 so far. Those implmentations are just for unit tests, and we are not sure that how the module works for large complicated modules.
 
