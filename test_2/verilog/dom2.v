@@ -4,7 +4,9 @@ module dom2 (
     input [1:0] is1,
     input [1:0] is2,
     input [2:0] refreshing,
-    output [2:0] os
+    output os0,
+    output os1,
+    output os2,
 );
 
     wire c0_0, c1_0, c2_0, c3_0, c4_0, c5_0, c6_0, c7_0, c8_0;
@@ -41,8 +43,8 @@ module dom2 (
     DFF reg7 (clk, c7_0, c7_1);
     DFF reg8 (clk, c8_0, c8_1);
 
-    assign os[0] = c0_1 ^ c1_1 ^ c2_1;
-    assign os[1] = c3_1 ^ c4_1 ^ c5_1;
-    assign os[2] = c6_1 ^ c7_1 ^ c8_1;
+    assign os0 = c0_1 ^ c1_1 ^ c2_1;
+    assign os1 = c3_1 ^ c4_1 ^ c5_1;
+    assign os2 = c6_1 ^ c7_1 ^ c8_1;
 
 endmodule
