@@ -98,8 +98,8 @@ def make_silver_syntax(inputs, outputs, gates, registers):
                 range_end = int(identifier[2])
                 for i in range(range_start, range_end+1):
                     wires.append(f"{identifier[1]}[{i}]")
-                    res.append(f"in {len(res)} {num_input_val}_{i}")
-                    #res.append(f"in {len(res)} {i}_{num_input_val}_")
+                    #res.append(f"in {len(res)} {num_input_val}_{i}")
+                    res.append(f"in {len(res)} {i}_{num_input_val}")
 
         else: # mono input
             wires.append(input_val)
@@ -117,7 +117,7 @@ def make_silver_syntax(inputs, outputs, gates, registers):
     current_num_registers = len(registers)
     while len(gates) > 0  or len(registers) > 0:
 
-        for _ in range(3):
+        for _ in range(5):
             for i in range(len(gates)-1, -1, -1):
                 gate = gates[i]
                 gate_in = gate["in"]
@@ -157,6 +157,8 @@ def make_silver_syntax(inputs, outputs, gates, registers):
 
         if loop_count == TIMEOUT:
             print("[*] TIME OUT")
+            print("Registers:", registers)
+            print("Gate:", gates)
             assert(False)
 
 
@@ -169,12 +171,14 @@ def make_silver_syntax(inputs, outputs, gates, registers):
             range_end = int(identifier[2])
             for i in range(range_start, range_end+1):
                 reg_in_num = wires.index(f"{identifier[1]}[{i}]")
-                t = f"out {reg_in_num} {num_output_val}_{i}"
+                t = f"out {reg_in_num} {i}_{num_output_val}"
+                #t = f"out {reg_in_num} {num_output_val}_{i}"
                 res.append(t)
 
         else:
-            reg_in_num = wires.index(f"{identifier[1]}")
-            t = f"out {reg_in_num} {num_output_val}_0"
+            reg_in_num = wires.index(f"{output_val}")
+            t = f"out {reg_in_num} 0_{num_output_val}"
+            #t = f"out {reg_in_num} {num_output_val}_0"
             res.append(t)
 
         num_output_val += 1
