@@ -5,7 +5,7 @@ TIMEOUT = 10
 
 match_comment = re.compile(r"[\(/]\*.+\*[\)/]") # for yosys comment-out
 #match_range = re.compile(r"\[(\d+?):(\d+?)\]")
-match_range = re.compile(r"([a-z0-9]+?)\[(\d+?):(\d+?)\]")
+match_range = re.compile(r"([a-zA-Z0-9]+?)\[(\d+?):(\d+?)\]")
 match_gate_2i1o = re.compile(r"\(\.A\((.+)\),\.B\((.+)\),\.Y\((.+)\)\)")
 match_reg = re.compile(r"\.D\((.+)\),\.Q\((.+)\)\)")
 
