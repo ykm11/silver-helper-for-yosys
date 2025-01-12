@@ -136,9 +136,9 @@ int parse(std::vector<std::string> &result,
                         "out " +
                         std::to_string(std::distance(wires.begin(), in)) + 
                         " " + 
-                        std::to_string(num_output_val) +
+                        std::to_string(i) +
                         "_" +
-                        std::to_string(i)
+                        std::to_string(num_output_val)
                     );
                 }
             }
@@ -147,11 +147,18 @@ int parse(std::vector<std::string> &result,
             auto in = std::find(wires.begin(), wires.end(), outputs[i]);
             if (in != wires.end()) {
                 result.push_back(
+#if 0
                     "out " +
                     std::to_string(std::distance(wires.begin(), in)) + 
                     " " + 
                     std::to_string(num_output_val) +
                     "_0"
+#else
+                    "out " +
+                    std::to_string(std::distance(wires.begin(), in)) + 
+                    " 0_" + 
+                    std::to_string(num_output_val)
+#endif
                     );        
             }
         }
