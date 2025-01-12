@@ -31,21 +31,23 @@ def read_verilog(f_name):
                 operand = op[0]
 
                 if operand == "input":
-                    if op[-1].lower() in ["clk", "rst"]: # identifier of the clock signal and reset should be "clk" and "rst", respectively
+                    name_value = op[-1]
+                    if name_value.lower() in ["clk", "rst"]: # identifier of the clock signal and reset should be "clk" and "rst", respectively
                         text = ""
                         continue
 
                     if len(op) < 3: # input a
-                        inputs.append(f"{op[1]}")
+                        inputs.append(f"{name_value}")
                     else:           # input [N:M] a
-                        inputs.append(f"{op[2]}{op[1]}")
+                        inputs.append(f"{name_value}{op[1]}")
 
                 elif operand == "output":
+                    name_value = op[-1]
 
                     if len(op) < 3:
-                        outputs.append(f"{op[1]}")
+                        outputs.append(f"{name_value}")
                     else:
-                        outputs.append(f"{op[2]}{op[1]}")
+                        outputs.append(f"{name_value}{op[1]}")
 
 
                 elif operand in ["AND", "XOR"]:
