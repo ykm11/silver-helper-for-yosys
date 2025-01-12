@@ -7,7 +7,7 @@ A directory LIB and a yosys script synthe.ys are forked/copied from [SILVER](htt
 
 We have tested for verilog implementations of DOM1, DOM2, DOM3, CMS2, and CMS3 so far. Those implmentations are just for unit tests, and we are not sure that how the module works for large complicated modules.
 
-A module which you want to test must be described as `MyAND(input [NUM_BIT-1:0] share-0, .., input [NUM_BIT-1:0] share-d, output ..);`, so you are not allowed combine d-shares input to one input value with d * NUM_BIT bit, e.g., `MyAND(input [15:0] share); // [15:8] -> share 0 and [7:0] -> share 1`.
+A module which you want to test must be described as `MyAND(input [NUM_BIT-1:0] share-0, .., input [NUM_BIT-1:0] share-d, output ..);`, so you are not allowed combine d-shares input to one input value with d * NUM_BIT bit, e.g., `MyAND(input [15:0] share); // [15:8] -> share 0 and [7:0] -> share 1`. Some netlist we have conducted the test are included in a directory `test_2` along with verilog files.
 
 ## Quick start
 Set $VERILOG_FILES and $TOP_MODULE according to your environment in `synth.ys`. Then execute commands like below;
