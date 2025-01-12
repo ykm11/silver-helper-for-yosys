@@ -209,20 +209,25 @@ int read_verilog(std::vector<Gate> &gates, std::vector<Dff> &registers,
             }
 
 
+            std::string value_name;
             ope = words[0];
             std::transform(ope.begin(), ope.end(), ope.begin(), ::tolower);
             if (ope == "input") {
-                if (words[words.size()-1] == "clk" || words[words.size()-1] == "rst") {
-                    text = "";
+                value_name = words[words.size()-1];
+                if (value_name == "clk" || value_name == "rst") {
+                    //text = "";
+                    text.clear();
                     words.clear();
                     continue;
                 }
 
                 if (words.size() < 3) { // input a
-                    inputs.push_back(words[1]);
+                    inputs.push_back(value_name);
+                    //inputs.push_back(words[1]);
 
                 } else {                // input [n:m] a -> a[n:m]
-                    inputs.push_back(words[2] + words[1]);
+                    inputs.push_back(value_name + words[1]);
+                    //inputs.push_back(words[2] + words[1]);
                 }
 #if DEBUG
                 printf("%s\n", words[words.size()-1].c_str());
@@ -231,9 +236,11 @@ int read_verilog(std::vector<Gate> &gates, std::vector<Dff> &registers,
 
             } else if (ope == "output") {
                 if (words.size() < 3) { // output a
-                    outputs.push_back(words[1]);
+                    outputs.push_back(value_name);
+                    //outputs.push_back(words[1]);
                 } else {                // output [n:m] a
-                    outputs.push_back(words[2] + words[1]);
+                    outputs.push_back(value_name + words[1]);
+                    //outputs.push_back(words[2] + words[1]);
                 }
 #if DEBUG
                 printf("%s\n", words[words.size()-1].c_str());

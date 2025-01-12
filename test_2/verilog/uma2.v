@@ -1,8 +1,8 @@
 module uma2(
     input clk,
-    input [1:0] is0,
-    input [1:0] is1,
-    input [1:0] is2,
+    input [1:0] Is0,
+    input [1:0] Is1,
+    input [1:0] Is2,
     input [1:0] refreshing,
     output os0,
     output os1,
@@ -22,17 +22,17 @@ module uma2(
     is2[1] = b2;
 */
 
-    assign c0_0 = (is0[0] & is0[1]); // a0 & b0
-    assign c1_0 = (is0[0] & is1[1]); // a0 & b1
-    assign c2_0 = (is0[0] & is2[1]); // a0 & b2
+    assign c0_0 = (Is0[0] & Is0[1]); // a0 & b0
+    assign c1_0 = (Is0[0] & Is1[1]); // a0 & b1
+    assign c2_0 = (Is0[0] & Is2[1]); // a0 & b2
 
-    assign c3_0 = (is1[0] & is0[1]); // a1 & b0
-    assign c4_0 = (is1[0] & is1[1]); // a1 & b1 
-    assign c5_0 = (is1[0] & is2[1]); // a1 & b2
+    assign c3_0 = (Is1[0] & Is0[1]); // a1 & b0
+    assign c4_0 = (Is1[0] & Is1[1]); // a1 & b1 
+    assign c5_0 = (Is1[0] & Is2[1]); // a1 & b2
 
-    assign c6_0 = (is2[0] & is0[1]); // a2 & b0
-    assign c7_0 = (is2[0] & is1[1]); // a2 & b1
-    assign c8_0 = (is2[0] & is2[1]); // a2 & b2
+    assign c6_0 = (Is2[0] & Is0[1]); // a2 & b0
+    assign c7_0 = (Is2[0] & Is1[1]); // a2 & b1
+    assign c8_0 = (Is2[0] & Is2[1]); // a2 & b2
 
     assign r = refreshing[0] ^ refreshing[1];
     wire r0_1, r1_1, r_1;
